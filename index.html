@@ -145,7 +145,8 @@
   .post-author { font-size: 11px; color: var(--text-dark); }
   .post-actions { display: flex; align-items: center; gap: 12px; }
   
-  .like-btn { background: none; border: none; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .like-btn { background: none; border: none; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; transition: opacity 0.2s; }
+  .like-btn:disabled { opacity: 0.5; cursor: wait; }
   .like-btn.liked { color: #fff; } 
   .like-btn.liked svg { fill: currentColor; }
   .like-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; transition: fill 0.3s; }
@@ -554,7 +555,6 @@
   const categoryFilter = document.getElementById('categoryFilter');
   const typeFilter = document.getElementById('typeFilter');
 
-  // Nasłuchiwanie bazy (działa na żywo)
   onSnapshot(collection(db, "posts"), (snapshot) => {
     allPosts = [];
     snapshot.forEach((docSnap) => {
@@ -617,7 +617,7 @@
         <div class="post-footer">
           <span class="post-author">@${post.authorName}</span>
           <div class="post-actions">
-            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="likePost('${post.id}')">
+            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="likePost('${post.id}', event)">
               <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
               <span>${post.likes || 0}</span>
             </button>
@@ -643,29 +643,44 @@
   };
   window.addEventListener('click', () => document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active')));
 
-  // --- LAJKI (Poprawione - Tylko 1 na użytkownika) ---
-  window.likePost = async (id) => {
+  // --- LAJKI (Naprawione) ---
+  window.likePost = async (id, event) => {
     if(!currentUser) return alert("Musisz być zalogowany, aby polubić!");
     
-    const postRef = doc(db, "posts", id);
-    const post = allPosts.find(p => p.id === id);
-    if (!post) return;
+    const btn = event.currentTarget;
+    if (btn.disabled) return; // Zabezpieczenie przed spamem kliknięć
+    btn.disabled = true;
 
+    const postRef = doc(db, "posts", id);
+    const postIndex = allPosts.findIndex(p => p.id === id);
+    if (postIndex === -1) { btn.disabled = false; return; }
+
+    const post = allPosts[postIndex];
     const likedBy = post.likedBy || [];
     const isLiked = likedBy.includes(currentUser.uid);
+    const currentLikes = post.likes || 0;
 
+    // Natychmiastowa aktualizacja wizualna (Optimistic UI)
     if (isLiked) {
-      // Cofnij lajka
-      await updateDoc(postRef, { 
-        likes: Math.max(0, (post.likes || 0) - 1),
-        likedBy: arrayRemove(currentUser.uid)
-      });
+      post.likes = Math.max(0, currentLikes - 1);
+      post.likedBy = likedBy.filter(uid => uid !== currentUser.uid);
     } else {
-      // Dodaj lajka
-      await updateDoc(postRef, { 
-        likes: (post.likes || 0) + 1,
-        likedBy: arrayUnion(currentUser.uid)
-      });
+      post.likes = currentLikes + 1;
+      post.likedBy = [...likedBy, currentUser.uid];
+    }
+    renderPosts(); // Serduszko podświetla się natychmiast
+
+    // Wysłanie do bazy w tle
+    try {
+      if (isLiked) {
+        await updateDoc(postRef, { likes: post.likes, likedBy: arrayRemove(currentUser.uid) });
+      } else {
+        await updateDoc(postRef, { likes: post.likes, likedBy: arrayUnion(currentUser.uid) });
+      }
+    } catch (error) {
+      console.error("Błąd lajka:", error);
+    } finally {
+      setTimeout(() => { btn.disabled = false; }, 1000); // Blokada na 1 sekundę
     }
   }
 
@@ -725,7 +740,7 @@
         authorName: currentUsername,
         authorId: currentUser.uid,
         likes: 0,
-        likedBy: [], // Pusta tablica, tu będą zapisywane osoby, które polubiły
+        likedBy: [],
         createdAt: Date.now()
       });
     }
