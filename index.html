@@ -24,7 +24,6 @@
   }
   input, textarea, .post-code, .post-desc { user-select: text; -webkit-user-select: text; }
   
-  /* === TŁO: SMOKI I MGŁA === */
   .mist-overlay { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at 20% 30%, rgba(70, 70, 70, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(60, 60, 60, 0.15) 0%, transparent 60%); mix-blend-mode: screen; }
   .dragons-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; perspective: 1000px; }
   .dragon-wrap { position: absolute; left: 0; top: 0; width: 100%; height: 100%; animation: flyPath 120s linear infinite; transform-origin: center; }
@@ -43,7 +42,6 @@
 
   body::before { content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: overlay; opacity: 0.05; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E"); }
 
-  /* === NAWIGACJA === */
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 18px 40px; background: rgba(10, 10, 10, 0.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border-soft); }
   .logo { display: flex; align-items: center; gap: 12px; font-family: 'Cinzel', serif; font-weight: 700; font-size: 18px; letter-spacing: 3px; color: #eaeaea; text-decoration: none; cursor: pointer;}
   .logo svg { width: 26px; height: 26px; }
@@ -63,11 +61,9 @@
   .nav-cta { padding: 10px 24px; border: 1px solid var(--border); background: transparent; color: var(--text); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; text-decoration: none; border-radius: var(--radius); font-family: 'Inter', sans-serif;}
   .nav-cta:hover { background: #f0f0f0; border-color: #f0f0f0; color: #0a0a0a; }
 
-  /* === WIDOKI === */
   .view { display: none; } .view.active { display: block; animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* === STRONA GŁÓWNA === */
   header { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 120px 24px 80px; position: relative; z-index: 2; }
   .hero-dragon { width: 140px; height: 140px; margin-bottom: 30px; opacity: 0.85; filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.15)); animation: float 6s ease-in-out infinite; }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
@@ -83,7 +79,6 @@
   .btn-ghost { background: rgba(10,10,10,0.5); border-color: var(--border); color: var(--text-dim); }
   .btn-ghost:hover { border-color: var(--text-dim); color: var(--text); transform: translateY(-2px); background: transparent; }
 
-  /* === SEKCJE === */
   section { padding: 110px 40px; position: relative; z-index: 2; max-width: 1240px; margin: 0 auto; }
   .section-label { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
   h2 { font-family: 'Cinzel', serif; font-weight: 700; font-size: clamp(30px, 4vw, 48px); letter-spacing: 2px; color: #eaeaea; margin-bottom: 20px; line-height: 1.1; }
@@ -149,9 +144,12 @@
   .post-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-soft); padding-top: 15px; }
   .post-author { font-size: 11px; color: var(--text-dark); }
   .post-actions { display: flex; align-items: center; gap: 12px; }
+  
   .like-btn { background: none; border: none; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; }
-  .like-btn.liked { color: #fff; } .like-btn.liked svg { fill: currentColor; }
-  .like-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .like-btn.liked { color: #fff; } 
+  .like-btn.liked svg { fill: currentColor; }
+  .like-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; transition: fill 0.3s; }
+  
   .btn-small { padding: 6px 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: #0a0a0a; background: #d0d0d0; border-radius: var(--radius); border: 1px solid transparent; cursor: pointer; font-weight: 600; }
 
   /* === MODAL === */
@@ -186,7 +184,6 @@
 </head>
 <body>
 
-<!-- TŁO -->
 <div class="mist-overlay" aria-hidden="true"></div>
 <div class="dragons-bg" aria-hidden="true">
   <div class="dragon-wrap dw-1">
@@ -211,7 +208,6 @@
 </div>
 <svg width="0" height="0" style="position:absolute"><symbol id="dragon-svg-template" viewBox="0 0 800 600"><path d="M 400 500 C 300 400, 500 300, 400 200 C 300 100, 400 50, 400 50" fill="none" stroke="#555" stroke-width="40" stroke-linecap="round"/><path d="M 370 380 L 250 340 L 230 370 M 250 340 L 240 310" fill="none" stroke="#555" stroke-width="10" stroke-linecap="round"/><path d="M 430 280 L 550 240 L 570 270 M 550 240 L 540 210" fill="none" stroke="#555" stroke-width="10" stroke-linecap="round"/><ellipse cx="400" cy="60" rx="30" ry="40" fill="#4a4a4a"/><path d="M 380 40 C 320 10, 250 40, 220 80" fill="none" stroke="#777" stroke-width="3"/><path d="M 420 40 C 480 10, 550 40, 580 80" fill="none" stroke="#777" stroke-width="3"/><circle cx="385" cy="50" r="5" fill="#fff" filter="drop-shadow(0 0 10px #fff)"/><circle cx="415" cy="50" r="5" fill="#fff" filter="drop-shadow(0 0 10px #fff)"/><path d="M 380 30 L 350 -10 L 370 -5 Z" fill="#666"/><path d="M 420 30 L 450 -10 L 430 -5 Z" fill="#666"/></symbol></svg>
 
-<!-- NAWIGACJA -->
 <nav>
   <a href="#" class="logo" onclick="showView('mainView')">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -238,7 +234,6 @@
   </div>
 </nav>
 
-<!-- ================= WIDOK 1: STRONA GŁÓWNA ================= -->
 <div id="mainView" class="view active">
   <header>
     <div class="hero-dragon">
@@ -317,7 +312,6 @@
   </footer>
 </div>
 
-<!-- ================= WIDOK 2: BAZA POSTÓW ================= -->
 <div id="bazaView" class="view">
   <div style="max-width:1240px; margin:0 auto; padding: 0 40px;">
     <div class="baza-header">
@@ -331,7 +325,6 @@
       </div>
     </div>
 
-    <!-- FILTRY -->
     <div class="filter-bar">
       <input type="text" id="searchInput" class="filter-input" placeholder="Szukaj posta...">
       <select id="sortSelect" class="filter-select">
@@ -357,7 +350,6 @@
   </div>
 </div>
 
-<!-- ================= MODAL: LOGOWANIE / REJESTRACJA ================= -->
 <div class="modal-overlay" id="authModal">
   <div class="modal-content">
     <div class="modal-header"><h3 id="authTitle">LOGOWANIE</h3><button class="modal-close" onclick="closeModal('authModal')">&times;</button></div>
@@ -371,7 +363,6 @@
   </div>
 </div>
 
-<!-- ================= MODAL: USTAWIANIE NICKU ================= -->
 <div class="modal-overlay" id="usernameModal">
   <div class="modal-content">
     <div class="modal-header"><h3>USTAW NICK</h3></div>
@@ -386,7 +377,6 @@
   </div>
 </div>
 
-<!-- ================= MODAL: DODAWANIE POSTA ================= -->
 <div class="modal-overlay" id="configModal">
   <div class="modal-content">
     <div class="modal-header">
@@ -411,11 +401,10 @@
   </div>
 </div>
 
-<!-- SKRYPTY FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBiQ0VEVd-dkV3pc9MD05eszB1-4C_hKY8",
@@ -431,7 +420,6 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Blokady anty-kopiowanie
   document.addEventListener('contextmenu', event => event.preventDefault());
   document.addEventListener('keydown', (e) => {
     if (e.key === 'F12') { e.preventDefault(); return false; }
@@ -445,20 +433,18 @@
   let isEditingPost = false;
   let editingPostId = null;
   let currentFormType = 'config';
-  let unsubscribePosts = null;
+  let allPosts = [];
 
   window.showView = function(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
     window.scrollTo(0, 0);
-    if(viewId === 'bazaView') loadPosts();
+    if(viewId === 'bazaView') renderPosts();
   }
 
-  window.closeModal = function(id) {
-    document.getElementById(id).classList.remove('active');
-  }
+  window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
 
-  // --- LOGOWANIE / REJESTRACJA ---
+  // --- LOGOWANIE ---
   window.openAuthModal = () => document.getElementById('authModal').classList.add('active');
   window.toggleAuthMode = () => {
     isRegisterMode = !isRegisterMode;
@@ -476,11 +462,8 @@
     errDiv.style.display = 'none';
 
     try {
-      if (isRegisterMode) {
-        await createUserWithEmailAndPassword(auth, email, pass);
-      } else {
-        await signInWithEmailAndPassword(auth, email, pass);
-      }
+      if (isRegisterMode) await createUserWithEmailAndPassword(auth, email, pass);
+      else await signInWithEmailAndPassword(auth, email, pass);
       closeModal('authModal');
     } catch (error) {
       errDiv.innerText = error.message;
@@ -490,7 +473,7 @@
 
   window.logout = () => signOut(auth);
 
-  // --- ZARZĄDZANIE STANEM UŻYTKOWNIKA ---
+  // --- UŻYTKOWNIK ---
   onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     const profileDiv = document.getElementById('userProfile');
@@ -499,7 +482,6 @@
     if (user) {
       loginBtn.style.display = 'none';
       profileDiv.style.display = 'flex';
-      
       const userDoc = await getDoc(doc(db, "users", user.uid));
       if (userDoc.exists()) {
         currentUsername = userDoc.data().username;
@@ -513,15 +495,13 @@
       profileDiv.style.display = 'none';
       currentUsername = null;
     }
+    renderPosts();
   });
 
-  // --- USTAWIANIE NICKU ---
   function updateUsernameUI(lastChangeTime) {
     document.getElementById('navUsername').innerText = '@' + currentUsername;
-    
     const COOLDOWN = 3 * 60 * 60 * 1000;
-    const timePassed = Date.now() - lastChangeTime;
-    const timeLeft = COOLDOWN - timePassed;
+    const timeLeft = COOLDOWN - (Date.now() - lastChangeTime);
     const editBtn = document.getElementById('editUsernameBtn');
     const timerSpan = document.getElementById('usernameTimer');
 
@@ -549,7 +529,6 @@
     e.preventDefault();
     const newUsername = document.getElementById('usernameInput').value.trim();
     const errDiv = document.getElementById('usernameError');
-    
     const usernameRef = doc(db, "usernames", newUsername.toLowerCase());
     const usernameSnap = await getDoc(usernameRef);
 
@@ -560,74 +539,100 @@
     }
 
     const now = Date.now();
-    await setDoc(doc(db, "users", currentUser.uid), {
-      username: newUsername,
-      lastChange: now
-    });
-
+    await setDoc(doc(db, "users", currentUser.uid), { username: newUsername, lastChange: now });
     await setDoc(usernameRef, { uid: currentUser.uid });
-
     currentUsername = newUsername;
     updateUsernameUI(now);
     closeModal('usernameModal');
+    renderPosts();
   });
 
-  // --- POSTY ---
+  // --- POBIERANIE POSTÓW ---
   const postsGrid = document.getElementById('postsGrid');
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const typeFilter = document.getElementById('typeFilter');
 
-  function loadPosts() {
-    if(unsubscribePosts) unsubscribePosts();
-    
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-    unsubscribePosts = onSnapshot(q, (snapshot) => {
-      postsGrid.innerHTML = '';
-      if (snapshot.empty) {
-        postsGrid.innerHTML = '<p style="color:#555; grid-column: 1 / -1; text-align:center;">Brak postów. Dodaj pierwszy config lub cheata!</p>';
-        return;
-      }
+  // Nasłuchiwanie bazy (działa na żywo)
+  onSnapshot(collection(db, "posts"), (snapshot) => {
+    allPosts = [];
+    snapshot.forEach((docSnap) => {
+      allPosts.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    renderPosts();
+  });
+
+  function renderPosts() {
+    if (!postsGrid) return;
+    postsGrid.innerHTML = '';
+
+    const searchTerm = searchInput.value.toLowerCase();
+    const sortBy = sortSelect.value;
+    const category = categoryFilter.value;
+    const type = typeFilter.value;
+
+    let filteredPosts = allPosts.filter(post => {
+      const matchSearch = post.title.toLowerCase().includes(searchTerm) || post.desc.toLowerCase().includes(searchTerm);
+      const matchCategory = category === 'all' || post.category === category;
+      const matchType = type === 'all' || post.type === type;
+      return matchSearch && matchCategory && matchType;
+    });
+
+    if (sortBy === 'newest') filteredPosts.sort((a, b) => b.createdAt - a.createdAt);
+    else if (sortBy === 'oldest') filteredPosts.sort((a, b) => a.createdAt - b.createdAt);
+    else if (sortBy === 'popular') filteredPosts.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+
+    if (filteredPosts.length === 0) {
+      postsGrid.innerHTML = '<p style="color:#555; grid-column: 1 / -1; text-align:center;">Brak postów spełniających kryteria.</p>';
+      return;
+    }
+
+    filteredPosts.forEach((post) => {
+      const isOwner = currentUser && post.authorId === currentUser.uid;
+      const isLiked = currentUser && post.likedBy && post.likedBy.includes(currentUser.uid);
       
-      snapshot.forEach((docSnap) => {
-        const post = docSnap.data();
-        const postId = docSnap.id;
-        const isOwner = currentUser && post.authorId === currentUser.uid;
-        
-        const card = document.createElement('div');
-        card.className = 'post-card';
-        card.innerHTML = `
-          <div class="post-header">
-            <span class="badge ${post.type}">${post.type.toUpperCase()}</span>
-            <div class="post-meta-right">
-              <span class="post-date">${new Date(post.createdAt).toLocaleDateString()}</span>
-              ${isOwner ? `
-                <div class="post-options">
-                  <button class="dots-btn" onclick="toggleDropdown(event, '${postId}')">&#8942;</button>
-                  <div class="dropdown-menu" id="dropdown-${postId}">
-                    <div class="dropdown-item" onclick="editPost('${postId}')">Edytuj</div>
-                    <div class="dropdown-item delete" onclick="deletePost('${postId}')">Usuń</div>
-                  </div>
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.innerHTML = `
+        <div class="post-header">
+          <span class="badge ${post.type}">${post.type.toUpperCase()}</span>
+          <div class="post-meta-right">
+            <span class="post-date">${new Date(post.createdAt).toLocaleDateString()}</span>
+            ${isOwner ? `
+              <div class="post-options">
+                <button class="dots-btn" onclick="toggleDropdown(event, '${post.id}')">&#8942;</button>
+                <div class="dropdown-menu" id="dropdown-${post.id}">
+                  <div class="dropdown-item" onclick="editPost('${post.id}')">Edytuj</div>
+                  <div class="dropdown-item delete" onclick="deletePost('${post.id}')">Usuń</div>
                 </div>
-              ` : ''}
-            </div>
+              </div>
+            ` : ''}
           </div>
-          <h3>${post.title}</h3>
-          <div class="post-category">${post.category}</div>
-          <p class="post-desc">${post.desc}</p>
-          <div class="post-code">${post.code}</div>
-          <div class="post-footer">
-            <span class="post-author">@${post.authorName}</span>
-            <div class="post-actions">
-              <button class="like-btn" onclick="likePost('${postId}', ${post.likes || 0})">
-                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                <span>${post.likes || 0}</span>
-              </button>
-              <a href="https://discord.gg/VXDZBkzckm" target="_blank" class="btn-small" onclick="alert('Aby pobrać, wejdź na Discord i odbierz rangę w kanale: 『🧩』│𝙎𝙋𝙊𝙇𝙀𝘾𝙕𝙉𝙊𝙎𝘾');">Pobierz</a>
-            </div>
+        </div>
+        <h3>${post.title}</h3>
+        <div class="post-category">${post.category}</div>
+        <p class="post-desc">${post.desc}</p>
+        <div class="post-code">${post.code}</div>
+        <div class="post-footer">
+          <span class="post-author">@${post.authorName}</span>
+          <div class="post-actions">
+            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="likePost('${post.id}')">
+              <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              <span>${post.likes || 0}</span>
+            </button>
+            <a href="https://discord.gg/VXDZBkzckm" target="_blank" class="btn-small" onclick="alert('Aby pobrać, wejdź na Discord i odbierz rangę w kanale: 『🧩』│𝙎𝙋𝙊𝙇𝙀𝘾𝙕𝙉𝙊𝙎𝘾');">Pobierz</a>
           </div>
-        `;
-        postsGrid.appendChild(card);
-      });
+        </div>
+      `;
+      postsGrid.appendChild(card);
     });
   }
+
+  searchInput.addEventListener('input', renderPosts);
+  sortSelect.addEventListener('change', renderPosts);
+  categoryFilter.addEventListener('change', renderPosts);
+  typeFilter.addEventListener('change', renderPosts);
 
   window.toggleDropdown = (e, id) => {
     e.stopPropagation();
@@ -638,9 +643,30 @@
   };
   window.addEventListener('click', () => document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active')));
 
-  window.likePost = async (id, currentLikes) => {
+  // --- LAJKI (Poprawione - Tylko 1 na użytkownika) ---
+  window.likePost = async (id) => {
     if(!currentUser) return alert("Musisz być zalogowany, aby polubić!");
-    await updateDoc(doc(db, "posts", id), { likes: currentLikes + 1 });
+    
+    const postRef = doc(db, "posts", id);
+    const post = allPosts.find(p => p.id === id);
+    if (!post) return;
+
+    const likedBy = post.likedBy || [];
+    const isLiked = likedBy.includes(currentUser.uid);
+
+    if (isLiked) {
+      // Cofnij lajka
+      await updateDoc(postRef, { 
+        likes: Math.max(0, (post.likes || 0) - 1),
+        likedBy: arrayRemove(currentUser.uid)
+      });
+    } else {
+      // Dodaj lajka
+      await updateDoc(postRef, { 
+        likes: (post.likes || 0) + 1,
+        likedBy: arrayUnion(currentUser.uid)
+      });
+    }
   }
 
   window.deletePost = async (id) => {
@@ -648,9 +674,8 @@
   }
 
   window.editPost = async (id) => {
-    const docSnap = await getDoc(doc(db, "posts", id));
-    if(!docSnap.exists()) return;
-    const post = docSnap.data();
+    const post = allPosts.find(p => p.id === id);
+    if(!post) return;
     
     document.getElementById('configTitle').value = post.title;
     document.getElementById('configCategory').value = post.category;
@@ -700,21 +725,12 @@
         authorName: currentUsername,
         authorId: currentUser.uid,
         likes: 0,
+        likedBy: [], // Pusta tablica, tu będą zapisywane osoby, które polubiły
         createdAt: Date.now()
       });
     }
     closeModal('configModal');
-  });
-
-  // Filtrowanie postów (frontend)
-  const searchInput = document.getElementById('searchInput');
-  const sortSelect = document.getElementById('sortSelect');
-  const categoryFilter = document.getElementById('categoryFilter');
-  const typeFilter = document.getElementById('typeFilter');
-
-  // Prosta obsługa filtrów (na razie wizualna, by nie komplikować kodu przy bazie)
-  [searchInput, sortSelect, categoryFilter, typeFilter].forEach(el => {
-    if(el) el.addEventListener('input', loadPosts); // Odświeżenie widoku
+    showView('bazaView'); 
   });
 
 </script>
