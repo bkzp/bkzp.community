@@ -327,7 +327,7 @@
     </div>
 
     <div class="filter-bar">
-      <input type="text" id="searchInput" class="filter-input" placeholder="Szukaj posta...">
+      <input type="text" id="searchInput" class="filter-input" placeholder="Szukaj posta..." autocomplete="off">
       <select id="sortSelect" class="filter-select">
         <option value="newest">Najnowsze</option>
         <option value="popular">Najpopularniejsze</option>
@@ -354,9 +354,9 @@
 <div class="modal-overlay" id="authModal">
   <div class="modal-content">
     <div class="modal-header"><h3 id="authTitle">LOGOWANIE</h3><button class="modal-close" onclick="closeModal('authModal')">&times;</button></div>
-    <form id="authForm">
-      <div class="form-group"><label>E-mail</label><input type="email" id="authEmail" class="form-control" required></div>
-      <div class="form-group"><label>Hasło (min. 6 znaków)</label><input type="password" id="authPassword" class="form-control" required minlength="6"></div>
+    <form id="authForm" autocomplete="off">
+      <div class="form-group"><label>E-mail</label><input type="email" id="authEmail" class="form-control" required autocomplete="off"></div>
+      <div class="form-group"><label>Hasło (min. 6 znaków)</label><input type="password" id="authPassword" class="form-control" required minlength="6" autocomplete="new-password"></div>
       <div id="authError" style="color:#ff6b6b; font-size:12px; display:none; margin-bottom:10px;"></div>
       <button type="submit" class="btn-modal btn-submit" style="width:100%;" id="authSubmitBtn">Zaloguj</button>
       <div class="auth-switch" id="authSwitchBtn" onclick="toggleAuthMode()">Nie masz konta? Zarejestruj się</div>
@@ -367,10 +367,10 @@
 <div class="modal-overlay" id="usernameModal">
   <div class="modal-content">
     <div class="modal-header"><h3>USTAW NICK</h3></div>
-    <form id="usernameForm">
+    <form id="usernameForm" autocomplete="off">
       <div class="form-group">
         <label>Twój unikalny nick</label>
-        <input type="text" id="usernameInput" class="form-control" required maxlength="20">
+        <input type="text" id="usernameInput" class="form-control" required maxlength="20" autocomplete="off">
         <div id="usernameError" style="color:#ff6b6b; font-size:12px; display:none; margin-top:8px;"></div>
       </div>
       <button type="submit" class="btn-modal btn-submit" style="width:100%;">Zapisz nick</button>
@@ -384,16 +384,17 @@
       <h3><svg id="modalIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span id="modalTitle">DODAJ CONFIG</span></h3>
       <button class="modal-close" onclick="closeModal('configModal')">&times;</button>
     </div>
-    <form id="configForm">
-      <div class="form-group"><label>Tytuł</label><input type="text" id="configTitle" class="form-control" required></div>
+    <!-- Dodane autocomplete="off" do formularza i pól -->
+    <form id="configForm" autocomplete="off">
+      <div class="form-group"><label>Tytuł</label><input type="text" id="configTitle" class="form-control" required autocomplete="off"></div>
       <div class="form-group">
         <label>Kategoria</label>
         <select id="configCategory" class="form-control">
           <option value="FPS">FPS</option><option value="Aimbot">Aimbot</option><option value="ESP">ESP</option><option value="Bypass">Bypass</option>
         </select>
       </div>
-      <div class="form-group"><label>Opis</label><textarea id="configDesc" class="form-control" placeholder="Krótki opis..." required></textarea></div>
-      <div class="form-group"><label>Kod / Zawartość Pliku</label><textarea id="configCode" class="form-control" placeholder="Wklej zawartość lub link..." required></textarea></div>
+      <div class="form-group"><label>Opis</label><textarea id="configDesc" class="form-control" placeholder="Krótki opis..." required autocomplete="off"></textarea></div>
+      <div class="form-group"><label>Kod / Zawartość Pliku</label><textarea id="configCode" class="form-control" placeholder="Wklej zawartość lub link..." required autocomplete="off"></textarea></div>
       <div class="modal-footer">
         <button type="button" class="btn-modal btn-cancel" onclick="closeModal('configModal')">Anuluj</button>
         <button type="submit" class="btn-modal btn-submit" id="modalSubmitBtn">Dodaj</button>
@@ -643,12 +644,12 @@
   };
   window.addEventListener('click', () => document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active')));
 
-  // --- LAJKI (Naprawione) ---
+  // --- LAJKI ---
   window.likePost = async (id, event) => {
     if(!currentUser) return alert("Musisz być zalogowany, aby polubić!");
     
     const btn = event.currentTarget;
-    if (btn.disabled) return; // Zabezpieczenie przed spamem kliknięć
+    if (btn.disabled) return; 
     btn.disabled = true;
 
     const postRef = doc(db, "posts", id);
@@ -660,7 +661,6 @@
     const isLiked = likedBy.includes(currentUser.uid);
     const currentLikes = post.likes || 0;
 
-    // Natychmiastowa aktualizacja wizualna (Optimistic UI)
     if (isLiked) {
       post.likes = Math.max(0, currentLikes - 1);
       post.likedBy = likedBy.filter(uid => uid !== currentUser.uid);
@@ -668,9 +668,8 @@
       post.likes = currentLikes + 1;
       post.likedBy = [...likedBy, currentUser.uid];
     }
-    renderPosts(); // Serduszko podświetla się natychmiast
+    renderPosts(); 
 
-    // Wysłanie do bazy w tle
     try {
       if (isLiked) {
         await updateDoc(postRef, { likes: post.likes, likedBy: arrayRemove(currentUser.uid) });
@@ -680,12 +679,13 @@
     } catch (error) {
       console.error("Błąd lajka:", error);
     } finally {
-      setTimeout(() => { btn.disabled = false; }, 1000); // Blokada na 1 sekundę
+      setTimeout(() => { btn.disabled = false; }, 1000); 
     }
   }
 
+  // --- USUWANIE BEZ POTWIERDZENIA ---
   window.deletePost = async (id) => {
-    if(confirm("Usunąć?")) await deleteDoc(doc(db, "posts", id));
+    await deleteDoc(doc(db, "posts", id));
   }
 
   window.editPost = async (id) => {
