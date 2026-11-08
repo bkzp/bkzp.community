@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BKZP Community</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --panel: #161616;
+    --border: #262626;
+    --border-soft: #1e1e1e;
+    --text: #d6d6d6;
+    --text-dim: #8a8a8a;
+    --text-dark: #5a5a5a;
+    --accent: #9a9a9a;
+    --radius: 999px;
+    --radius-sm: 12px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(200, 200, 200, 0.04), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(200, 200, 200, 0.03), transparent 45%),
+      linear-gradient(180deg, #0a0a0a 0%, #0d0d0d 50%, #080808 100%);
+    background-attachment: fixed;
+  }
+
+  /* === TŁO: SMOKI I MGŁA === */
+  .mist-overlay {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 20% 30%, rgba(70, 70, 70, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(60, 60, 60, 0.15) 0%, transparent 60%);
+    mix-blend-mode: screen;
+  }
+
+  .dragons-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; perspective: 1000px; }
+  .dragon-wrap { position: absolute; left: 0; top: 0; width: 100%; height: 100%; animation: flyPath 120s linear infinite; transform-origin: center; }
+  .dragon-svg { width: 500px; height: auto; fill: currentColor; filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.15)); animation: undulate 6s ease-in-out infinite alternate; }
+  
+  .dw-1 { animation: flyPath1 140s linear infinite; animation-delay: -20s; }
+  .dw-1 .dragon-svg { width: 650px; opacity: 0.85; color: #4a4a4a; filter: drop-shadow(0 0 30px rgba(255,255,255,0.2)); }
+  .dw-2 { animation: flyPath2 110s linear infinite; animation-delay: -60s; }
+  .dw-2 .dragon-svg { width: 400px; opacity: 0.7; color: #5c5c5c; animation-duration: 7s; filter: drop-shadow(0 0 20px rgba(255,255,255,0.15)); }
+  .dw-3 { animation: flyPath3 180s linear infinite; animation-delay: -100s; }
+  .dw-3 .dragon-svg { width: 900px; opacity: 0.35; color: #333; filter: blur(1px) drop-shadow(0 0 40px rgba(255,255,255,0.1)); animation-duration: 9s; }
+
+  @keyframes undulate { 0% { transform: rotate(0deg) scale(1) translateY(0); } 100% { transform: rotate(3deg) scale(0.98) translateY(-20px); } }
+  @keyframes flyPath1 { 0% { transform: translate(-10%, -20%) rotate(15deg); } 50% { transform: translate(80%, 60%) rotate(25deg); } 100% { transform: translate(-10%, 120%) rotate(15deg); } }
+  @keyframes flyPath2 { 0% { transform: translate(110%, 10%) rotate(-155deg); } 50% { transform: translate(20%, 80%) rotate(-165deg); } 100% { transform: translate(110%, 130%) rotate(-155deg); } }
+  @keyframes flyPath3 { 0% { transform: translate(-20%, 50%) rotate(45deg); } 50% { transform: translate(60%, -10%) rotate(55deg); } 100% { transform: translate(120%, 70%) rotate(45deg); } }
+
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: overlay; opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+
+  /* === NAWIGACJA === */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 40px; background: rgba(10, 10, 10, 0.75);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .logo { display: flex; align-items: center; gap: 12px; font-family: 'Cinzel', serif; font-weight: 700; font-size: 18px; letter-spacing: 3px; color: #eaeaea; text-decoration: none;}
+  .logo svg { width: 26px; height: 26px; }
+  .logo span { color: var(--accent); }
+
+  nav ul { display: flex; gap: 34px; list-style: none; }
+  nav ul a { color: var(--text-dim); text-decoration: none; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s; position: relative; cursor: pointer;}
+  nav ul a:hover { color: #eaeaea; }
+  nav ul a::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+  nav ul a:hover::after { width: 100%; }
+
+  .nav-right { display: flex; align-items: center; gap: 20px; }
+  
+  /* Profil użytkownika w nawigacji */
+  .user-profile {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; letter-spacing: 1px; color: var(--text-dim);
+    background: rgba(20, 20, 20, 0.8); padding: 6px 16px; border-radius: var(--radius);
+    border: 1px solid var(--border-soft);
+  }
+  .user-profile span { color: #fff; font-weight: 500; }
+  .user-profile button {
+    background: none; border: none; color: var(--accent); cursor: pointer;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s;
+  }
+  .user-profile button:hover { color: #fff; }
+  .user-profile .timer { color: var(--text-dark); font-family: monospace; font-size: 12px; }
+
+  .nav-cta {
+    padding: 10px 24px; border: 1px solid var(--border); background: transparent; color: var(--text);
+    font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s; text-decoration: none; border-radius: var(--radius);
+  }
+  .nav-cta:hover { background: #f0f0f0; border-color: #f0f0f0; color: #0a0a0a; }
+
+  /* === WIDOKI (SPA) === */
+  .view { display: none; }
+  .view.active { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* === GŁÓWNA STRONA (HERO) === */
+  header { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 120px 24px 80px; position: relative; z-index: 2; }
+  .hero-dragon { width: 140px; height: 140px; margin-bottom: 30px; opacity: 0.85; filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.15)); animation: float 6s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+  .hero-kicker { font-size: 12px; letter-spacing: 6px; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(48px, 9vw, 108px); line-height: 0.95; letter-spacing: 4px; background: linear-gradient(180deg, #f2f2f2 0%, #9a9a9a 60%, #4a4a4a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 8px; text-shadow: 0 0 50px rgba(255,255,255,0.1); }
+  .hero-sub { font-family: 'Cinzel', serif; font-size: clamp(14px, 1.6vw, 18px); letter-spacing: 8px; color: var(--text-dark); text-transform: uppercase; margin-bottom: 40px; }
+  .hero-desc { max-width: 660px; font-size: 15px; color: var(--text-dim); margin-bottom: 50px; background: rgba(10,10,10,0.6); padding: 20px; border-radius: 12px; backdrop-filter: blur(6px); border: 1px solid var(--border-soft); }
+
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn { padding: 16px 38px; font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.3s; border: 1px solid; display: inline-block; border-radius: var(--radius); }
+  .btn-primary { background: #eaeaea; border-color: #eaeaea; color: #0a0a0a; font-weight: 500; }
+  .btn-primary:hover { background: transparent; border-color: #eaeaea; color: #f0f0f0; transform: translateY(-2px); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+  .btn-ghost { background: rgba(10,10,10,0.5); border-color: var(--border); color: var(--text-dim); }
+  .btn-ghost:hover { border-color: var(--text-dim); color: var(--text); transform: translateY(-2px); background: transparent; }
+
+  /* === SEKCJE === */
+  section { padding: 110px 40px; position: relative; z-index: 2; max-width: 1240px; margin: 0 auto; }
+  .section-label { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  h2 { font-family: 'Cinzel', serif; font-weight: 700; font-size: clamp(30px, 4vw, 48px); letter-spacing: 2px; color: #eaeaea; margin-bottom: 20px; line-height: 1.1; }
+  .section-intro { max-width: 620px; color: var(--text-dim); font-size: 15px; margin-bottom: 60px; }
+
+  .about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: center; }
+  .about-text p { color: var(--text-dim); font-size: 15px; margin-bottom: 18px; }
+  .about-text strong { color: var(--text); font-weight: 500; }
+  .about-visual { position: relative; aspect-ratio: 1; border: 1px solid var(--border); border-radius: 16px; background: radial-gradient(circle at 50% 40%, rgba(220, 220, 220, 0.07), transparent 55%), linear-gradient(135deg, #101010, #0a0a0a); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); }
+  .about-visual svg { width: 55%; height: 55%; opacity: 0.9; filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.2)); }
+
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-soft); border: 1px solid var(--border-soft); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .feature { background: rgba(17, 17, 17, 0.85); padding: 42px 32px; transition: background 0.3s; backdrop-filter: blur(5px); }
+  .feature:hover { background: #141414; }
+  .feature-num { font-family: 'Cinzel', serif; font-size: 13px; color: var(--accent); letter-spacing: 3px; margin-bottom: 20px; opacity: 0.7; }
+  .feature h3 { font-family: 'Cinzel', serif; font-weight: 500; font-size: 19px; letter-spacing: 1px; color: #e0e0e0; margin-bottom: 12px; }
+  .feature p { color: var(--text-dark); font-size: 14px; }
+
+  .join { text-align: center; padding: 130px 40px; }
+  .join h2 { margin-bottom: 24px; }
+  .join p { max-width: 560px; margin: 0 auto 44px; color: var(--text-dim); font-size: 15px; background: rgba(10,10,10,0.7); padding: 20px; border-radius: 12px; backdrop-filter: blur(6px); border: 1px solid var(--border-soft); }
+  .join-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  footer { border-top: 1px solid var(--border-soft); padding: 50px 40px 40px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; max-width: 1240px; margin: 0 auto; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dark); position: relative; z-index: 2; background: rgba(10,10,10,0.85); backdrop-filter: blur(10px); }
+  footer .logo { font-size: 14px; letter-spacing: 3px; }
+  footer .discord { color: var(--text-dim); text-decoration: none; transition: color 0.3s; padding: 8px 18px; border: 1px solid var(--border); border-radius: var(--radius); }
+  footer .discord:hover { color: #0a0a0a; background: #eaeaea; border-color: #eaeaea; }
+
+  /* === WIDOK: BAZA POSTÓW === */
+  #bazaView { min-height: 100vh; padding-top: 120px; padding-bottom: 80px; }
+  
+  .baza-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+  .baza-header h2 { margin-bottom: 0; }
+  
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); text-decoration: none;
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s; cursor: pointer;
+    background: none; border: none; padding: 0; font-family: 'Inter', sans-serif; margin-bottom: 10px;
+  }
+  .back-btn:hover { color: #fff; }
+
+  .action-bar { display: flex; gap: 16px; flex-wrap: wrap; }
+  
+  /* === FILTRY I WYSZUKIWANIE === */
+  .filter-bar {
+    display: flex; gap: 12px; margin-bottom: 40px; flex-wrap: wrap;
+    background: rgba(17, 17, 17, 0.6); padding: 15px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-soft); backdrop-filter: blur(5px);
+  }
+
+  .filter-input, .filter-select {
+    background: #0a0a0a; border: 1px solid #333; border-radius: var(--radius);
+    padding: 10px 18px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px;
+    outline: none; transition: border-color 0.3s;
+  }
+  
+  .filter-input { flex-grow: 1; min-width: 200px; }
+  .filter-select { cursor: pointer; min-width: 150px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 35px;}
+  .filter-input:focus, .filter-select:focus { border-color: #666; }
+
+  .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+
+  /* Karta Posta */
+  .post-card {
+    background: rgba(17, 17, 17, 0.85); border: 1px solid var(--border-soft); border-radius: var(--radius-sm);
+    padding: 28px; display: flex; flex-direction: column; transition: all 0.3s; backdrop-filter: blur(5px);
+    position: relative;
+  }
+  .post-card:hover { border-color: #3a3a3a; transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+  .post-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #555, transparent); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+
+  .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .badge { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: var(--radius); border: 1px solid #444; background: #222; color: #ccc; font-weight: 500; }
+  .badge.config { border-color: #888; color: #ddd; background: #1a1a1a; }
+  .badge.cheat { border-color: #fff; color: #fff; background: #333; }
+  
+  .post-meta-right { display: flex; align-items: center; gap: 12px; }
+  .post-date { font-size: 11px; color: var(--text-dark); letter-spacing: 1px; }
+
+  /* 3 KROPKI I DROPDOWN */
+  .post-options { position: relative; }
+  .dots-btn {
+    background: none; border: none; color: var(--text-dark); cursor: pointer; font-size: 20px;
+    line-height: 1; padding: 0 5px; transition: color 0.3s;
+  }
+  .dots-btn:hover { color: #fff; }
+  
+  .dropdown-menu {
+    position: absolute; right: 0; top: 100%; background: #111; border: 1px solid #333;
+    border-radius: 8px; display: none; flex-direction: column; z-index: 10; min-width: 120px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8); overflow: hidden; margin-top: 5px;
+  }
+  .dropdown-menu.active { display: flex; }
+  .dropdown-item {
+    padding: 10px 16px; font-size: 12px; color: var(--text); cursor: pointer;
+    transition: background 0.2s; text-align: left;
+  }
+  .dropdown-item:hover { background: #222; }
+  .dropdown-item.delete { color: #ff6b6b; }
+  .dropdown-item.delete:hover { background: #2a1515; }
+
+  .post-card h3 { font-family: 'Cinzel', serif; font-weight: 500; font-size: 20px; color: #f0f0f0; margin-bottom: 8px; line-height: 1.3; }
+  .post-category { font-size: 11px; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .post-card p { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; flex-grow: 1; }
+  
+  .post-code {
+    background: #080808; border: 1px solid #222; padding: 12px; border-radius: 8px;
+    font-family: monospace; font-size: 12px; color: #888; margin-bottom: 20px;
+    max-height: 100px; overflow-y: auto; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+  }
+
+  .post-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-soft); padding-top: 15px; }
+  .post-author { font-size: 11px; color: var(--text-dark); letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;}
+  .post-author span { color: var(--text-dim); font-weight: 600; }
+  
+  .post-actions { display: flex; align-items: center; gap: 12px; }
+
+  /* Lajki */
+  .like-btn {
+    background: none; border: none; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-family: 'Inter', sans-serif; transition: color 0.3s; padding: 5px;
+  }
+  .like-btn:hover { color: #fff; }
+  .like-btn.liked { color: #fff; }
+  .like-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; transition: fill 0.3s; }
+  .like-btn.liked svg { fill: currentColor; }
+
+  .btn-small { padding: 6px 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: #0a0a0a; background: #d0d0d0; border-radius: var(--radius); border: 1px solid transparent; transition: all 0.3s; font-weight: 600; cursor: pointer; }
+  .btn-small:hover { background: transparent; color: #fff; border-color: #fff; }
+
+  /* === MODAL (POP-UP) === */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px; }
+  .modal-overlay.active { opacity: 1; visibility: visible; }
+  .modal-content { background: #111111; border: 1px solid #333; border-radius: var(--radius-sm); width: 100%; max-width: 500px; padding: 30px; position: relative; transform: translateY(20px); transition: all 0.3s ease; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+  .modal-overlay.active .modal-content { transform: translateY(0); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .modal-header h3 { font-family: 'Cinzel', serif; font-size: 20px; color: #fff; display: flex; align-items: center; gap: 10px; letter-spacing: 1px; }
+  .modal-close { background: none; border: none; color: #888; font-size: 24px; cursor: pointer; transition: color 0.3s; line-height: 1; }
+  .modal-close:hover { color: #fff; }
+
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 8px; font-weight: 500; }
+  .form-control { width: 100%; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 12px 16px; color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color 0.3s, box-shadow 0.3s; }
+  .form-control:focus { border-color: #666; }
+  .form-control:read-only { color: #666; cursor: not-allowed; }
+  textarea.form-control { min-height: 80px; resize: vertical; }
+  select.form-control { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; padding-right: 40px; cursor: pointer; }
+  
+  .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
+  .btn-modal { padding: 12px 24px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; border-radius: var(--radius); cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; border: 1px solid transparent; }
+  .btn-cancel { background: transparent; color: #888; border-color: transparent; }
+  .btn-cancel:hover { color: #fff; }
+  .btn-submit { background: #eaeaea; color: #0a0a0a; font-weight: 600; }
+  .btn-submit:hover { background: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+
+  /* MODAL NAZWY (BLOKADA) */
+  #usernameModal .modal-close, #usernameModal .btn-cancel { display: none; }
+  #usernameModal .modal-content { border-color: var(--accent); }
+
+  /* Animacja błędu */
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+  .shake { animation: shake 0.3s ease-in-out; }
+
+  /* RESPONSYWNOŚĆ */
+  @media (max-width: 1024px) { .features { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 860px) {
+    nav { padding: 16px 20px; flex-wrap: wrap; gap: 15px; justify-content: center; }
+    nav ul { display: none; }
+    section { padding: 80px 24px; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    footer { flex-direction: column; text-align: center; }
+    .dw-1 .dragon-svg { width: 350px; }
+    .dw-2 .dragon-svg { width: 250px; }
+    .dw-3 .dragon-svg { width: 450px; }
+    
+    .filter-bar { flex-direction: column; }
+    .filter-input, .filter-select { width: 100%; }
+  }
+  @media (max-width: 640px) { .features { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- TŁO -->
+<div class="mist-overlay" aria-hidden="true"></div>
+<div class="dragons-bg" aria-hidden="true">
+  <div class="dragon-wrap dw-1">
+    <svg class="dragon-svg" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5a5a5a"/><stop offset="50%" stop-color="#222222"/><stop offset="100%" stop-color="#3a3a3a"/></linearGradient>
+        <pattern id="scales" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M 0 6 Q 6 0 12 6 Q 6 12 0 6 Z" fill="none" stroke="#777" stroke-width="1.5"/></pattern>
+      </defs>
+      <path d="M 400 500 C 300 400, 500 300, 400 200 C 300 100, 400 50, 400 50" fill="none" stroke="url(#bodyGrad)" stroke-width="45" stroke-linecap="round"/>
+      <path d="M 400 500 C 300 400, 500 300, 400 200 C 300 100, 400 50, 400 50" fill="none" stroke="url(#scales)" stroke-width="45" stroke-linecap="round" opacity="0.8"/>
+      <path d="M 370 380 L 250 340 L 230 370 M 250 340 L 240 310 M 250 340 L 280 320" fill="none" stroke="url(#bodyGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 430 280 L 550 240 L 570 270 M 550 240 L 540 210 M 550 240 L 520 220" fill="none" stroke="url(#bodyGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 380 160 L 260 120 L 240 150 M 260 120 L 250 90 M 260 120 L 290 100" fill="none" stroke="url(#bodyGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 420 110 L 540 70 L 560 100 M 540 70 L 530 40 M 540 70 L 510 50" fill="none" stroke="url(#bodyGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 420 480 L 430 460 L 410 480 M 380 380 L 360 360 L 400 380 M 440 280 L 460 260 L 430 280 M 380 180 L 360 160 L 390 180 M 410 100 L 420 80 L 400 100 M 400 60 L 410 40 L 390 60" fill="#111" stroke="#666" stroke-width="2"/>
+      <ellipse cx="400" cy="60" rx="35" ry="45" fill="url(#bodyGrad)"/><ellipse cx="400" cy="60" rx="35" ry="45" fill="url(#scales)" opacity="0.7"/>
+      <path d="M 380 40 C 320 10, 250 40, 220 80" fill="none" stroke="#888" stroke-width="3" stroke-linecap="round"/><path d="M 420 40 C 480 10, 550 40, 580 80" fill="none" stroke="#888" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 380 30 L 350 -10 L 370 -5 Z" fill="#4a4a4a"/><path d="M 420 30 L 450 -10 L 430 -5 Z" fill="#4a4a4a"/>
+      <circle cx="385" cy="50" r="6" fill="#ffffff" filter="drop-shadow(0 0 15px #fff)"/><circle cx="415" cy="50" r="6" fill="#ffffff" filter="drop-shadow(0 0 15px #fff)"/>
+      <path d="M 400 500 L 380 550 L 400 580 L 420 550 Z" fill="url(#bodyGrad)"/>
+    </svg>
+  </div>
+  <div class="dragon-wrap dw-2"><svg class="dragon-svg" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg"><use href="#dragon-svg-template" /></svg></div>
+  <div class="dragon-wrap dw-3"><svg class="dragon-svg" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg"><use href="#dragon-svg-template" /></svg></div>
+</div>
+<svg width="0" height="0" style="position:absolute"><symbol id="dragon-svg-template" viewBox="0 0 800 600"><path d="M 400 500 C 300 400, 500 300, 400 200 C 300 100, 400 50, 400 50" fill="none" stroke="#555" stroke-width="40" stroke-linecap="round"/><path d="M 370 380 L 250 340 L 230 370 M 250 340 L 240 310" fill="none" stroke="#555" stroke-width="10" stroke-linecap="round"/><path d="M 430 280 L 550 240 L 570 270 M 550 240 L 540 210" fill="none" stroke="#555" stroke-width="10" stroke-linecap="round"/><ellipse cx="400" cy="60" rx="30" ry="40" fill="#4a4a4a"/><path d="M 380 40 C 320 10, 250 40, 220 80" fill="none" stroke="#777" stroke-width="3"/><path d="M 420 40 C 480 10, 550 40, 580 80" fill="none" stroke="#777" stroke-width="3"/><circle cx="385" cy="50" r="5" fill="#fff" filter="drop-shadow(0 0 10px #fff)"/><circle cx="415" cy="50" r="5" fill="#fff" filter="drop-shadow(0 0 10px #fff)"/><path d="M 380 30 L 350 -10 L 370 -5 Z" fill="#666"/><path d="M 420 30 L 450 -10 L 430 -5 Z" fill="#666"/></symbol></svg>
+
+<!-- NAWIGACJA -->
+<nav>
+  <a href="#" class="logo" onclick="showView('mainView')">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 4L6 9L9 6L12 11L15 6L18 9L21 4L19 13C18.5 16 16 18 12 18C8 18 5.5 16 5 13L3 4Z" stroke="#9a9a9a" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="10" cy="12" r="0.8" fill="#9a9a9a"/><circle cx="14" cy="12" r="0.8" fill="#9a9a9a"/>
+      <path d="M8 20L12 22L16 20" stroke="#4a4a4a" stroke-width="1.2" stroke-linejoin="round"/>
+    </svg>
+    BKZP<span>.</span>
+  </a>
+  <ul>
+    <li><a onclick="showView('mainView'); document.getElementById('about').scrollIntoView();">O nas</a></li>
+    <li><a onclick="showView('mainView'); document.getElementById('features').scrollIntoView();">Tematy</a></li>
+    <li><a onclick="showView('bazaView')">Baza</a></li>
+  </ul>
+  <div class="nav-right">
+    <!-- Profil / Licznik -->
+    <div class="user-profile" id="userProfile" style="display:none;">
+      <span id="navUsername">@user</span>
+      <button id="editUsernameBtn" onclick="openUsernameModal()" style="display:none;">Zmień</button>
+      <span class="timer" id="usernameTimer" style="display:none;">--:--:--</span>
+    </div>
+    <a href="https://discord.gg/VXDZBkzckm" target="_blank" rel="noopener" class="nav-cta">Discord</a>
+  </div>
+</nav>
+
+<!-- ================= WIDOK 1: STRONA GŁÓWNA ================= -->
+<div id="mainView" class="view active">
+  <header>
+    <div class="hero-dragon">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <defs><linearGradient id="dg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e6e6e6"/><stop offset="100%" stop-color="#3a3a3a"/></linearGradient></defs>
+        <path d="M20 22 L30 34 L40 26 L50 40 L60 26 L70 34 L80 22 L76 52 C74 68 62 80 50 80 C38 80 26 68 24 52 L20 22Z" stroke="url(#dg)" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="42" cy="50" r="2.5" fill="#d6d6d6"/><circle cx="58" cy="50" r="2.5" fill="#d6d6d6"/>
+        <path d="M44 66 L50 70 L56 66" stroke="#5a5a5a" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M15 40 L24 44 M85 40 L76 44" stroke="#4a4a4a" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="hero-kicker">Aimbot · Wallhack · ESP · Bypassy</div>
+    <h1>BKZP</h1>
+    <div class="hero-sub">Community</div>
+    <p class="hero-desc">
+      Zamknięta banda ludzi, którzy siedzą w tematach cheatóww dłużej, niż większość anty-cheatów
+      istnieje. Aimboty, wallhacki, spoofery, bypassy — gadamy o tym szczerze, testujemy na żywo
+      i dzielimy się tym, co naprawdę działa. Bez sklepowych bajek, bez "polecam ten cheat".
+    </p>
+    <div class="hero-btns">
+      <a href="https://discord.gg/VXDZBkzckm" target="_blank" rel="noopener" class="btn btn-primary">Wejdź na Discord</a>
+      <button onclick="showView('bazaView')" class="btn btn-ghost">Przejdź do bazy</button>
+    </div>
+  </header>
+
+  <section id="about">
+    <div class="section-label">O nas</div>
+    <h2>Robimy to, o czym inni tylko gadają</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p><strong>BKZP</strong> to nie sklep i nie kolejny discord założony przez dzieciaka z YouTube'a. To grupa ludzi, którzy od lat siedzą w cheatach i anty-cheatach — testują, rozkminiają i dzielą się tym, co działa dzisiaj, a nie co działało rok temu.</p>
+        <p>Znamy różnicę między aimbotem na silniku gry a DMA. Wiemy, że wallhack to nie to samo co ESP, i że obejście Vanguarda to zupełnie inna liga niż obejście EAC. Gadamy o tym konkretnie, z przykładami, bez pieprzenia.</p>
+        <p>Nie mamy sklepu, nie sprzedajemy cheatóww i nie robimy reklam. Wiedza zostaje w środku. Jak dostałeś link — to znaczy, że ktoś z ekipy uznał, że ogarniasz temat.</p>
+      </div>
+      <div class="about-visual">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <path d="M50 8 L58 30 L80 24 L74 46 L92 50 L74 54 L80 76 L58 70 L50 92 L42 70 L20 76 L26 54 L8 50 L26 46 L20 24 L42 30 L50 8Z" stroke="#d6d6d6" stroke-width="1.2" stroke-linejoin="round" opacity="0.85"/>
+          <circle cx="50" cy="50" r="14" stroke="#4a4a4a" stroke-width="1"/>
+          <path d="M44 50 L50 44 L56 50 L50 56 Z" fill="#b8b8b8" opacity="0.9"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="section-label">Tematy</div>
+    <h2>O czym gadamy</h2>
+    <p class="section-intro">Konkretne rzeczy, które siedzą nam w głowie od lat. Bez ogólników, bez "cheaty są fajne, polecam". Rozkminiamy każdy temat do końca.</p>
+    <div class="features">
+      <div class="feature"><div class="feature-num">01</div><h3>Configi pod każdą grę</h3><p>Robimy configi pod każdy serwer i pod każde AC — EAC, BattlEye, Vanguard, Ricochet, FACEIT, ESL. Każdy config jest dostrojony pod konkretny serwer, bo to co działa na publicznym nie przejdzie na turniejowym. Zero uniwersalnych ustawień, wszystko pod konkretny setup.</p></div>
+      <div class="feature"><div class="feature-num">02</div><h3>Bypassy EAC / BE / Vanguard</h3><p>Każdy anty-cheat ma słabe punkty. Siedzimy w bypassach na bieżąco i dzielimy się tym, co przechodzi dziś — a nie tym, co było modne w 2021.</p></div>
+      <div class="feature"><div class="feature-num">03</div><h3>Spoofery i DMA</h3><p>HWID spoofery, DMA, kernel-drivery, EFI. Tematy, które oddzielają ludzi, którzy wiedzą, od tych, którzy "gdzieś słyszeli".</p></div>
+      <div class="feature"><div class="feature-num">04</div><h3>Własne devki</h3><p>Nasi ludzie piszą własne sterowniki, cheaty i narzędzia. Nie kopiujemy z GitHuba — sami siedzimy w kodzie i to widać.</p></div>
+      <div class="feature"><div class="feature-num">05</div><h3>Statusy detekcji i testy</h3><p>Anty-cheaty aktualizują się codziennie. Sprawdzamy na żywo, co jest aktualnie wykrywane, a co nadal przechodzi (undetected), zanim wsadzisz to na swoje main konto.</p></div>
+      <div class="feature"><div class="feature-num">06</div><h3>Wsparcie i debug</h3><p>Wywala BSODa? Kernel panic? Injector nie odpala? Siedzimy z tobą na voice i naprawiamy sprzęt, aż wszystko zaskoczy jak należy.</p></div>
+    </div>
+  </section>
+
+  <section id="join" class="join">
+    <div class="section-label">Zaproszenie</div>
+    <h2>Wejście tylko z polecenia</h2>
+    <p>Nie mamy otwartej rekrutacji ani formularza zgłoszeniowego. Jak masz link, to ktoś z ekipy ci go dał. Jak nie masz — napisz do kogoś, kto ma, albo czekaj, aż sam się odezwie.</p>
+    <div class="join-btns">
+      <a href="https://discord.gg/VXDZBkzckm" target="_blank" rel="noopener" class="btn btn-primary">Discord</a>
+      <a href="https://discord.gg/VXDZBkzckm" target="_blank" rel="noopener" class="btn btn-ghost">Kontakt</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 4L6 9L9 6L12 11L15 6L18 9L21 4L19 13C18.5 16 16 18 12 18C8 18 5.5 16 5 13L3 4Z" stroke="#9a9a9a" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      BKZP<span>.</span> Community
+    </div>
+    <div>Wszystko zostaje między nami</div>
+    <a href="https://discord.gg/VXDZBkzckm" target="_blank" rel="noopener" class="discord">Discord ↗</a>
+  </footer>
+</div>
+
+<!-- ================= WIDOK 2: BAZA POSTÓW ================= -->
+<div id="bazaView" class="view">
+  <div style="max-width:1240px; margin:0 auto; padding: 0 40px;">
+    <div class="baza-header">
+      <div>
+        <button class="back-btn" onclick="showView('mainView')">← Wróć na stronę główną</button>
+        <h2>Configi & Cheaty</h2>
+      </div>
+      <div class="action-bar">
+        <button class="btn btn-ghost" id="openCheatBtn">Dodaj cheata</button>
+        <button class="btn btn-primary" id="openConfigBtn">Dodaj configa</button>
+      </div>
+    </div>
+
+    <!-- PASEK FILTRÓW -->
+    <div class="filter-bar">
+      <input type="text" id="searchInput" class="filter-input" placeholder="Szukaj posta (tytuł, opis)...">
+      
+      <select id="sortSelect" class="filter-select">
+        <option value="newest">Najnowsze</option>
+        <option value="popular">Najpopularniejsze</option>
+        <option value="oldest">Najstarsze</option>
+      </select>
+
+      <select id="categoryFilter" class="filter-select">
+        <option value="all">Wszystkie kategorie</option>
+        <option value="FPS & Optymalizacja">FPS & Optymalizacja</option>
+        <option value="Aimbot / Combat">Aimbot / Combat</option>
+        <option value="ESP / Wallhack">ESP / Wallhack</option>
+        <option value="Bypass / Injector">Bypass / Injector</option>
+        <option value="Inne">Inne</option>
+      </select>
+
+      <select id="typeFilter" class="filter-select">
+        <option value="all">Wszystkie moduły</option>
+        <option value="config">Config</option>
+        <option value="cheat">Cheat</option>
+      </select>
+    </div>
+    
+    <!-- Tutaj pojawiają się posty -->
+    <div class="posts-grid" id="postsGrid"></div>
+  </div>
+</div>
+
+<!-- ================= MODAL: USTAWIANIE NAZWY ================= -->
+<div class="modal-overlay" id="usernameModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>USTAW NAZWĘ</span>
+      </h3>
+    </div>
+    
+    <form id="usernameForm">
+      <div class="form-group">
+        <label for="usernameInput">Twoja nazwa w społeczności</label>
+        <input type="text" id="usernameInput" class="form-control" placeholder="np. DragonSlayer" required maxlength="20">
+        <div id="usernameError" style="display: none; color: #ff6b6b; font-size: 12px; margin-top: 8px; font-weight: 500;">Ta nazwa jest już zajęta. Wybierz inną.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn-modal btn-submit" style="width: 100%;">Zapisz nazwę</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= MODAL: DODAWANIE POSTA ================= -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>
+        <svg id="modalIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span id="modalTitle">DODAJ CONFIG</span>
+      </h3>
+      <button class="modal-close" id="closeModalBtn">&times;</button>
+    </div>
+    
+    <form id="configForm">
+      <div class="form-group">
+        <label for="configTitle">Tytuł</label>
+        <input type="text" id="configTitle" class="form-control" placeholder="np. Pro Performance Preset" required>
+      </div>
+
+      <div class="form-group">
+        <label for="configCategory">Kategoria</label>
+        <select id="configCategory" class="form-control">
+          <option value="FPS & Optymalizacja">FPS & Optymalizacja</option>
+          <option value="Aimbot / Combat">Aimbot / Combat</option>
+          <option value="ESP / Wallhack">ESP / Wallhack</option>
+          <option value="Bypass / Injector">Bypass / Injector</option>
+          <option value="Inne">Inne</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="configAuthor">Autor</label>
+        <input type="text" id="configAuthor" class="form-control" readonly>
+      </div>
+
+      <div class="form-group">
+        <label for="configDesc">Opis</label>
+        <textarea id="configDesc" class="form-control" placeholder="Krótki opis..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="configCode">Kod / Zawartość Pliku (Text/JSON)</label>
+        <textarea id="configCode" class="form-control" placeholder="Wklej zawartość lub link..." required></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-modal btn-cancel" id="cancelModalBtn">Anuluj</button>
+        <button type="submit" class="btn-modal btn-submit" id="modalSubmitBtn">Dodaj</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // --- LOGIKA PRZEŁĄCZANIA WIDOKÓW ---
+  function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // --- SYSTEM NAZWY UŻYTKOWNIKA ---
+  const COOLDOWN_MS = 3 * 60 * 60 * 1000; // 3 godziny
+  let username = localStorage.getItem('bkzp_username') || null;
+  let lastUsernameChange = parseInt(localStorage.getItem('bkzp_last_change')) || 0;
+  
+  const defaultTaken = ['admin', 'bkzp', 'dragon', 'cheater', 'user', 'mod', 'root', 'smok', 'pvp'];
+  let takenUsernames = JSON.parse(localStorage.getItem('bkzp_taken_usernames')) || defaultTaken;
+  
+  const userProfile = document.getElementById('userProfile');
+  const navUsername = document.getElementById('navUsername');
+  const editUsernameBtn = document.getElementById('editUsernameBtn');
+  const usernameTimer = document.getElementById('usernameTimer');
+  const usernameModal = document.getElementById('usernameModal');
+  const usernameForm = document.getElementById('usernameForm');
+  const usernameInput = document.getElementById('usernameInput');
+  const usernameError = document.getElementById('usernameError');
+
+  let timerInterval;
+
+  function updateUsernameUI() {
+    if (!username) {
+      usernameModal.classList.add('active');
+      userProfile.style.display = 'none';
+      return;
+    }
+
+    userProfile.style.display = 'flex';
+    navUsername.innerText = '@' + username;
+    
+    const timePassed = Date.now() - lastUsernameChange;
+    const timeLeft = COOLDOWN_MS - timePassed;
+
+    if (timeLeft <= 0) {
+      editUsernameBtn.style.display = 'inline-block';
+      usernameTimer.style.display = 'none';
+      clearInterval(timerInterval);
+    } else {
+      editUsernameBtn.style.display = 'none';
+      usernameTimer.style.display = 'inline-block';
+      
+      updateTimerDisplay(timeLeft);
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const nowTimeLeft = COOLDOWN_MS - (Date.now() - lastUsernameChange);
+        if (nowTimeLeft <= 0) {
+          updateUsernameUI();
+        } else {
+          updateTimerDisplay(nowTimeLeft);
+        }
+      }, 1000);
+    }
+  }
+
+  function updateTimerDisplay(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    usernameTimer.innerText = `Zmiana za: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  window.openUsernameModal = function() {
+    if (Date.now() - lastUsernameChange < COOLDOWN_MS) return;
+    usernameInput.value = username || '';
+    usernameError.style.display = 'none';
+    usernameInput.style.borderColor = '#333';
+    usernameModal.classList.add('active');
+  };
+
+  usernameInput.addEventListener('input', () => {
+    const val = usernameInput.value.trim().toLowerCase();
+    const current = (username || '').toLowerCase();
+    
+    if (takenUsernames.map(u => u.toLowerCase()).includes(val) && val !== current) {
+      usernameError.style.display = 'block';
+      usernameInput.style.borderColor = '#ff6b6b';
+    } else {
+      usernameError.style.display = 'none';
+      usernameInput.style.borderColor = '#333';
+    }
+  });
+
+  usernameForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newUsername = usernameInput.value.trim();
+    if (!newUsername) return;
+
+    const lowerNew = newUsername.toLowerCase();
+    const lowerTaken = takenUsernames.map(u => u.toLowerCase());
+    const lowerCurrent = (username || '').toLowerCase();
+
+    if (lowerTaken.includes(lowerNew) && lowerNew !== lowerCurrent) {
+      usernameError.style.display = 'block';
+      usernameInput.style.borderColor = '#ff6b6b';
+      usernameInput.classList.remove('shake');
+      void usernameInput.offsetWidth;
+      usernameInput.classList.add('shake');
+      return;
+    }
+
+    username = newUsername;
+    lastUsernameChange = Date.now();
+    
+    if (!lowerTaken.includes(lowerNew)) {
+      takenUsernames.push(username);
+      localStorage.setItem('bkzp_taken_usernames', JSON.stringify(takenUsernames));
+    }
+
+    localStorage.setItem('bkzp_username', username);
+    localStorage.setItem('bkzp_last_change', lastUsernameChange);
+    
+    usernameModal.classList.remove('active');
+    updateUsernameUI();
+  });
+
+  // --- DANE POSTÓW ---
+  localStorage.removeItem('bkzp_posts');
+  let posts = [];
+  let likedPosts = JSON.parse(localStorage.getItem('bkzp_liked_posts')) || [];
+  let myPosts = JSON.parse(localStorage.getItem('bkzp_my_posts')) || [];
+
+  const postsGrid = document.getElementById('postsGrid');
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const typeFilter = document.getElementById('typeFilter');
+
+  // --- OBSŁUGA DROPDOWN ---
+  window.toggleDropdown = function(event, id) {
+    event.stopPropagation();
+    document.querySelectorAll('.dropdown-menu').forEach(el => {
+      if(el.id !== `dropdown-${id}`) el.classList.remove('active');
+    });
+    const menu = document.getElementById(`dropdown-${id}`);
+    if(menu) menu.classList.toggle('active');
+  };
+
+  window.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+  });
+
+  // --- RENDEROWANIE I FILTROWANIE ---
+  function renderPosts() {
+    postsGrid.innerHTML = '';
+
+    const searchTerm = searchInput.value.toLowerCase();
+    const sortBy = sortSelect.value;
+    const category = categoryFilter.value;
+    const type = typeFilter.value;
+
+    let filteredPosts = posts.filter(post => {
+      const matchesSearch = post.title.toLowerCase().includes(searchTerm) || post.desc.toLowerCase().includes(searchTerm);
+      const matchesCategory = category === 'all' || post.category === category;
+      const matchesType = type === 'all' || post.type === type;
+      return matchesSearch && matchesCategory && matchesType;
+    });
+
+    if (sortBy === 'newest') filteredPosts.sort((a, b) => b.id - a.id);
+    else if (sortBy === 'oldest') filteredPosts.sort((a, b) => a.id - b.id);
+    else if (sortBy === 'popular') filteredPosts.sort((a, b) => b.likes - a.likes);
+
+    if (filteredPosts.length === 0) {
+      postsGrid.innerHTML = '<p style="color: var(--text-dark); grid-column: 1 / -1; text-align: center; padding: 40px;">Brak postów. Dodaj pierwszy config lub cheata!</p>';
+      return;
+    }
+
+    filteredPosts.forEach(post => {
+      const isLiked = likedPosts.includes(post.id);
+      const isOwner = myPosts.includes(post.id);
+      
+      const safeTitle = post.title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeAuthor = post.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeDesc = post.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeCode = post.code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeCategory = post.category.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.innerHTML = `
+        <div class="post-header">
+          <span class="badge ${post.type}">${post.type.toUpperCase()}</span>
+          <div class="post-meta-right">
+            <span class="post-date">${post.date}</span>
+            ${isOwner ? `
+              <div class="post-options">
+                <button class="dots-btn" onclick="toggleDropdown(event, ${post.id})">&#8942;</button>
+                <div class="dropdown-menu" id="dropdown-${post.id}">
+                  <div class="dropdown-item" onclick="editPost(${post.id})">Edytuj</div>
+                  <div class="dropdown-item delete" onclick="deletePost(${post.id})">Usuń</div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+        <h3>${safeTitle}</h3>
+        <div class="post-category">${safeCategory}</div>
+        <p>${safeDesc}</p>
+        <div class="post-code">${safeCode}</div>
+        <div class="post-footer">
+          <span class="post-author">@${safeAuthor}</span>
+          <div class="post-actions">
+            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})" title="Polub">
+              <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              <span>${post.likes}</span>
+            </button>
+            <a href="https://discord.gg/VXDZBkzckm" target="_blank" class="btn-small">Pobierz</a>
+          </div>
+        </div>
+      `;
+      postsGrid.appendChild(card);
+    });
+  }
+
+  searchInput.addEventListener('input', renderPosts);
+  sortSelect.addEventListener('change', renderPosts);
+  categoryFilter.addEventListener('change', renderPosts);
+  typeFilter.addEventListener('change', renderPosts);
+
+  // --- LAJKI ---
+  window.toggleLike = function(id) {
+    const postIndex = posts.findIndex(p => p.id === id);
+    if (postIndex === -1) return;
+
+    const likedIndex = likedPosts.indexOf(id);
+    
+    if (likedIndex > -1) {
+      likedPosts.splice(likedIndex, 1);
+      posts[postIndex].likes = Math.max(0, posts[postIndex].likes - 1);
+    } else {
+      likedPosts.push(id);
+      posts[postIndex].likes += 1;
+    }
+
+    localStorage.setItem('bkzp_posts', JSON.stringify(posts));
+    localStorage.setItem('bkzp_liked_posts', JSON.stringify(likedPosts));
+    renderPosts();
+  }
+
+  // --- EDYCJA I USUWANIE ---
+  let editingPostId = null;
+
+  window.editPost = function(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    editingPostId = id;
+    
+    document.getElementById('configTitle').value = post.title;
+    document.getElementById('configCategory').value = post.category;
+    document.getElementById('configDesc').value = post.desc;
+    document.getElementById('configCode').value = post.code;
+
+    document.getElementById('modalTitle').innerText = 'EDYTUJ ' + (post.type === 'config' ? 'CONFIG' : 'CHEATA');
+    document.getElementById('modalSubmitBtn').innerText = 'Zapisz zmiany';
+    
+    modal.classList.add('active');
+  };
+
+  window.deletePost = function(id) {
+    posts = posts.filter(p => p.id !== id);
+    myPosts = myPosts.filter(postId => postId !== id);
+    
+    localStorage.setItem('bkzp_posts', JSON.stringify(posts));
+    localStorage.setItem('bkzp_my_posts', JSON.stringify(myPosts));
+    
+    renderPosts();
+  };
+
+  // --- MODAL POSTÓW ---
+  const modal = document.getElementById('configModal');
+  const openConfigBtn = document.getElementById('openConfigBtn');
+  const openCheatBtn = document.getElementById('openCheatBtn');
+  const closeBtn = document.getElementById('closeModalBtn');
+  const cancelBtn = document.getElementById('cancelModalBtn');
+  const form = document.getElementById('configForm');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalIcon = document.getElementById('modalIcon');
+  const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+
+  let currentFormType = 'config';
+
+  function resetModal() {
+    editingPostId = null;
+    form.reset();
+    currentFormType = 'config';
+    modalTitle.innerText = 'DODAJ CONFIG';
+    modalSubmitBtn.innerText = 'Dodaj';
+    modalIcon.innerHTML = '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>';
+    document.getElementById('configAuthor').value = username || 'Gość';
+  }
+
+  openConfigBtn.addEventListener('click', () => {
+    resetModal();
+    currentFormType = 'config';
+    modalTitle.innerText = 'DODAJ CONFIG';
+    modal.classList.add('active');
+  });
+
+  openCheatBtn.addEventListener('click', () => {
+    resetModal();
+    currentFormType = 'cheat';
+    modalTitle.innerText = 'DODAJ CHEAT';
+    modalIcon.innerHTML = '<path d="M12 2L2 22h20L12 2z"></path>';
+    modal.classList.add('active');
+  });
+
+  const closeModal = () => {
+    modal.classList.remove('active');
+    resetModal();
+  };
+
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const title = document.getElementById('configTitle').value;
+    const category = document.getElementById('configCategory').value;
+    const desc = document.getElementById('configDesc').value;
+    const code = document.getElementById('configCode').value;
+    const author = username || 'Gość';
+
+    if (editingPostId) {
+      const index = posts.findIndex(p => p.id === editingPostId);
+      if (index > -1) {
+        posts[index] = {
+          ...posts[index],
+          title, category, author, desc, code,
+          date: "Przed chwilą (edytowano)"
+        };
+      }
+    } else {
+      const newPost = {
+        id: Date.now(),
+        title, category, author, desc, code,
+        type: currentFormType,
+        likes: 0,
+        date: "Przed chwilą"
+      };
+      posts.unshift(newPost);
+      myPosts.push(newPost.id);
+      localStorage.setItem('bkzp_my_posts', JSON.stringify(myPosts));
+    }
+
+    localStorage.setItem('bkzp_posts', JSON.stringify(posts));
+    
+    searchInput.value = '';
+    categoryFilter.value = 'all';
+    typeFilter.value = 'all';
+    sortSelect.value = 'newest';
+
+    renderPosts();
+    closeModal();
+    showView('bazaView');
+  });
+
+  // Inicjalizacja
+  updateUsernameUI();
+  renderPosts();
+</script>
+
+</body>
+</html>
