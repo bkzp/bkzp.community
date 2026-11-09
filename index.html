@@ -140,7 +140,7 @@
   .post-card h3 { font-family: 'Cinzel', serif; font-size: 20px; color: #f0f0f0; margin-bottom: 8px; }
   .post-category { font-size: 11px; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; }
   .post-card p { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; flex-grow: 1; }
-  .post-code { background: #080808; border: 1px solid #222; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; color: #888; margin-bottom: 20px; max-height: 100px; overflow-y: auto; }
+  .post-code { background: #080808; border: 1px solid #222; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; color: #888; margin-bottom: 20px; max-height: 100px; overflow-y: auto; word-break: break-all;}
   .post-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-soft); padding-top: 15px; }
   .post-author { font-size: 11px; color: var(--text-dark); }
   .post-actions { display: flex; align-items: center; gap: 12px; }
@@ -156,7 +156,7 @@
   /* === MODAL === */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s; padding: 20px; }
   .modal-overlay.active { opacity: 1; visibility: visible; }
-  .modal-content { background: #111; border: 1px solid #333; border-radius: var(--radius-sm); width: 100%; max-width: 500px; padding: 30px; transform: translateY(20px); transition: all 0.3s; }
+  .modal-content { background: #111; border: 1px solid #333; border-radius: var(--radius-sm); width: 100%; max-width: 500px; padding: 30px; transform: translateY(20px); transition: all 0.3s; max-height: 90vh; overflow-y: auto;}
   .modal-overlay.active .modal-content { transform: translateY(0); }
   .modal-header { display: flex; justify-content: space-between; margin-bottom: 24px; }
   .modal-header h3 { font-family: 'Cinzel', serif; color: #fff; display: flex; align-items: center; gap: 10px; }
@@ -164,6 +164,7 @@
   .form-group { margin-bottom: 20px; }
   .form-group label { display: block; font-size: 11px; color: #888; margin-bottom: 8px; text-transform: uppercase; }
   .form-control { width: 100%; background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 12px; color: #fff; outline: none; }
+  .form-control:focus { border-color: #666; }
   .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
   .btn-modal { padding: 12px 24px; font-size: 12px; text-transform: uppercase; border-radius: var(--radius); cursor: pointer; border: none; }
   .btn-cancel { background: transparent; color: #888; }
@@ -384,7 +385,6 @@
       <h3><svg id="modalIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span id="modalTitle">DODAJ CONFIG</span></h3>
       <button class="modal-close" onclick="closeModal('configModal')">&times;</button>
     </div>
-    <!-- Dodane autocomplete="off" do formularza i pól -->
     <form id="configForm" autocomplete="off">
       <div class="form-group"><label>Tytuł</label><input type="text" id="configTitle" class="form-control" required autocomplete="off"></div>
       <div class="form-group">
@@ -394,7 +394,14 @@
         </select>
       </div>
       <div class="form-group"><label>Opis</label><textarea id="configDesc" class="form-control" placeholder="Krótki opis..." required autocomplete="off"></textarea></div>
-      <div class="form-group"><label>Kod / Zawartość Pliku</label><textarea id="configCode" class="form-control" placeholder="Wklej zawartość lub link..." required autocomplete="off"></textarea></div>
+      
+      <!-- NOWE POLE DO WGRYWANIA PLIKU -->
+      <div class="form-group">
+        <label for="configCode">Kod / Zawartość Pliku (Text/JSON) lub Link</label>
+        <input type="file" id="configFile" class="form-control" style="margin-bottom: 10px; padding: 8px;">
+        <textarea id="configCode" class="form-control" placeholder="Wklej zawartość lub link do pobrania..." required autocomplete="off"></textarea>
+      </div>
+
       <div class="modal-footer">
         <button type="button" class="btn-modal btn-cancel" onclick="closeModal('configModal')">Anuluj</button>
         <button type="submit" class="btn-modal btn-submit" id="modalSubmitBtn">Dodaj</button>
@@ -445,6 +452,31 @@
   }
 
   window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+
+  // --- OBSŁUGA WGRYWANIA PLIKU ---
+  document.getElementById('configFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Firebase ma limit 1MB na dokument. Ostrzegamy przy dużych plikach.
+    if (file.size > 800000) {
+      alert("Ten plik jest za duży (limit bazy to 1MB). Wgraj go na np. GitHub/MediaFire i wklej bezpośredni link w polu tekstowym poniżej!");
+      this.value = ''; // Reset
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      // Wkleja tekst lub kod Base64 do textarea
+      document.getElementById('configCode').value = event.target.result;
+    };
+    
+    if (file.type.startsWith('text/') || file.name.endsWith('.json') || file.name.endsWith('.txt') || file.name.endsWith('.cfg')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsDataURL(file); // Dla plików binarnych (obrazki, małe .jar)
+    }
+  });
 
   // --- LOGOWANIE ---
   window.openAuthModal = () => document.getElementById('authModal').classList.add('active');
@@ -683,7 +715,6 @@
     }
   }
 
-  // --- USUWANIE BEZ POTWIERDZENIA ---
   window.deletePost = async (id) => {
     await deleteDoc(doc(db, "posts", id));
   }
